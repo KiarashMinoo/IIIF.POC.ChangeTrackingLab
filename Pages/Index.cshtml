@@ -1,0 +1,187 @@
+@page
+@model IndexModel
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>IIIF Change Tracking Lab</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+<main class="shell">
+    <header class="hero">
+        <div>
+            <span class="eyebrow">PROOF OF CONCEPT</span>
+            <h1>IIIF Change Tracking Lab</h1>
+            <p>
+                Explore SDK-native object-graph change tracking, changed-only Manifest output,
+                delta event history, and revision-oriented workflows.
+            </p>
+        </div>
+        <a class="repo-link" href="https://github.com/KiarashMinoo/IIIF.Manifest.Serializer.Net" target="_blank" rel="noopener noreferrer">Core SDK</a>
+    </header>
+
+    <section class="status-grid">
+        <article class="metric"><span>HasChanges</span><strong class="@(Model.Lab.HasChanges ? "positive" : "")">@Model.Lab.HasChanges</strong></article>
+        <article class="metric"><span>Pending changes</span><strong>@Model.Lab.PendingChangeCount</strong></article>
+        <article class="metric"><span>Full Manifest</span><strong>@Model.Lab.FullBytes.ToString("N0") B</strong></article>
+        <article class="metric"><span>Changed-only</span><strong>@Model.Lab.ChangedBytes.ToString("N0") B</strong></article>
+        <article class="metric"><span>Payload reduction</span><strong>@Model.Lab.PayloadReductionPercent.ToString("N1")%</strong></article>
+        <article class="metric"><span>Committed revisions</span><strong>@Model.Lab.Revision</strong></article>
+    </section>
+
+    <section class="card">
+        <div class="section-heading">
+            <div>
+                <h2>Mutate the Manifest</h2>
+                <p>Each action changes the server-side IIIF object graph for this browser session.</p>
+            </div>
+        </div>
+
+        <form method="post" class="button-row">
+            <button asp-page-handler="ChangeRights">Change rights</button>
+            <button asp-page-handler="ChangeCanvasHeight">Change Canvas height</button>
+            <button asp-page-handler="RenameCanvas">Rename Canvas</button>
+            <button asp-page-handler="AddCanvas">Add Canvas</button>
+            <button asp-page-handler="RemoveCanvas">Remove Canvas</button>
+        </form>
+
+        <form method="post" class="button-row secondary-row">
+            <button class="commit" asp-page-handler="Commit" disabled="@(!Model.Lab.HasChanges)">
+                Commit delta to event log + AcceptChanges
+            </button>
+            <button class="secondary" asp-page-handler="Accept" disabled="@(!Model.Lab.HasChanges)">AcceptChanges only</button>
+            <button class="secondary" asp-page-handler="Reset">Reset demo</button>
+        </form>
+    </section>
+
+    @if (Model.Lab.HasRemoval)
+    {
+        <div class="warning">
+            <strong>Removal detected.</strong>
+            A valid partial IIIF Manifest cannot express a tombstone. The removal remains available in
+            <code>GetChangeSet().Changes</code>.
+        </div>
+    }
+
+    <section class="card">
+        <div class="section-heading">
+            <div>
+                <h2>Pending ChangeSet</h2>
+                <p>Nested changes retain their concrete kind and receive a path from the Manifest root.</p>
+            </div>
+        </div>
+
+        @if (Model.Lab.CurrentChanges.Count == 0)
+        {
+            <div class="empty">The current Manifest matches its tracking baseline.</div>
+        }
+        else
+        {
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Path</th>
+                        <th>Kind</th>
+                        <th>Original</th>
+                        <th>Current</th>
+                        <th>Detected UTC</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var change in Model.Lab.CurrentChanges)
+                    {
+                        <tr>
+                            <td><code>@change.Path</code></td>
+                            <td><span class="kind">@change.Kind</span></td>
+                            <td class="json-cell">@change.OriginalValue</td>
+                            <td class="json-cell">@change.CurrentValue</td>
+                            <td>@change.DetectedAtUtc.ToString("HH:mm:ss.fff")</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </section>
+
+    <section class="two-column">
+        <article class="card code-card">
+            <div class="section-heading">
+                <div>
+                    <h2>Full Manifest</h2>
+                    <p>Normal serialization remains complete regardless of tracking state.</p>
+                </div>
+                <span class="badge">@Model.Lab.FullBytes.ToString("N0") bytes</span>
+            </div>
+            <pre>@Model.Lab.FullJson</pre>
+        </article>
+
+        <article class="card code-card">
+            <div class="section-heading">
+                <div>
+                    <h2>Changed-only Manifest</h2>
+                    <p>Best-effort valid partial Manifest for changed/current content.</p>
+                </div>
+                <span class="badge">@Model.Lab.ChangedBytes.ToString("N0") bytes</span>
+            </div>
+            <pre>@Model.Lab.ChangedJson</pre>
+        </article>
+    </section>
+
+    <section class="card">
+        <div class="section-heading">
+            <div>
+                <h2>Simulated append-only event history</h2>
+                <p>Values are converted to stable JSON snapshots before the tracking baseline is accepted.</p>
+            </div>
+            <span class="badge">@Model.Lab.EventLog.Count events</span>
+        </div>
+
+        @if (Model.Lab.EventLog.Count == 0)
+        {
+            <div class="empty">Commit a pending delta to create event-history rows.</div>
+        }
+        else
+        {
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Revision</th>
+                        <th>Persisted UTC</th>
+                        <th>Path</th>
+                        <th>Kind</th>
+                        <th>Original snapshot</th>
+                        <th>Current snapshot</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var evt in Model.Lab.EventLog)
+                    {
+                        <tr>
+                            <td>@evt.Revision</td>
+                            <td>@evt.PersistedAtUtc.ToString("HH:mm:ss.fff")</td>
+                            <td><code>@evt.Path</code></td>
+                            <td><span class="kind">@evt.Kind</span></td>
+                            <td class="json-cell">@Shorten(evt.OriginalJson)</td>
+                            <td class="json-cell">@Shorten(evt.CurrentJson)</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </section>
+
+    
+</main>
+</body>
+</html>
+
+@functions {
+    private static string Shorten(string value, int maxLength = 150) =>
+        value.Length <= maxLength ? value : value[..maxLength] + "…";
+}

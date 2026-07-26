@@ -1,0 +1,59 @@
+# .NET build output
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+[Aa]rtifacts/
+[Pp]ublish/
+
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.rsuser
+
+# JetBrains Rider / ReSharper
+.idea/
+*.sln.iml
+_ReSharper*/
+*.DotSettings.user
+
+# Test results and code coverage
+[Tt]est[Rr]esult*/
+*.trx
+*.coverage
+*.coveragexml
+coverage*.json
+coverage*.xml
+coverage*.info
+coveragereport/
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+!packages/build/
+*.nuget.props
+*.nuget.targets
+
+# ASP.NET Core local configuration and secrets
+appsettings.Local.json
+appsettings.*.local.json
+secrets.json
+
+# Generated logs and temporary files
+*.log
+logs/
+*.tmp
+*.temp
+~$*
+
+# BenchmarkDotNet
+BenchmarkDotNet.Artifacts/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+Desktop.ini
