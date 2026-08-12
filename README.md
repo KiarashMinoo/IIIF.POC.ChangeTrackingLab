@@ -1,6 +1,6 @@
 # IIIF.POC.ChangeTrackingLab
 
-A lightweight **ASP.NET Core Razor Pages** proof of concept demonstrating SDK-native object-graph change tracking in the IIIF Manifest Serializer for .NET.
+An ASP.NET Core Razor Pages proof of concept for SDK-native object-graph change tracking in the IIIF Manifest Serializer for .NET.
 
 Core SDK:
 
@@ -11,10 +11,14 @@ https://github.com/KiarashMinoo/IIIF.Manifest.Serializer.Net
 The POC consumes the SDK from NuGet rather than using a project reference:
 
 ```xml
-<PackageReference Include="IIIF.Manifest.Serializer.Net" Version="3.0.13" />
+<PackageReference Include="IIIF.Manifest.Serializer.Net" Version="3.0.17" />
 ```
 
+Package source: [nuget.org](https://api.nuget.org/v3/index.json) (no `NuGet.Config` in this repo — the default feed resolves both direct and transitive packages, including `Newtonsoft.Json`).
+
 ## What the POC demonstrates
+
+A single Razor Page holds a sample three-canvas Manifest per browser session and exposes buttons that exercise the SDK's change-tracking API:
 
 - `HasChanges`
 - `GetChanges()`
@@ -35,39 +39,21 @@ The POC consumes the SDK from NuGet rather than using a project reference:
 
 ```bash
 dotnet restore
+dotnet build -c Release
 dotnet run
 ```
 
-The application uses in-memory session state for the demo. Each browser session gets an independent Manifest/change-tracking state.
+The application uses in-memory session state for the demo. Each browser session gets an independent Manifest/change-tracking state, held by `ChangeTrackingSessionStore` and expiring after 20 minutes of inactivity.
 
-## Recommended repository name
+## Documentation
 
-```text
-IIIF.POC.ChangeTrackingLab
-```
+Per-folder reference documentation lives under [`docs`](docs/README.md):
 
-## Recommended GitHub About description
+- [Models](docs/Models/README.md) — `ChangeRow`, `PersistedChangeEvent`, `LabViewModel`
+- [Pages](docs/Pages/README.md) — the `IndexModel` page and its markup
+- [Services](docs/Services/README.md) — session storage, Manifest mutations, JSON formatting, the sample Manifest factory
+- [wwwroot](docs/wwwroot/README.md) — the demo page's stylesheet
 
-**Proof-of-concept ASP.NET Core Razor Pages app demonstrating IIIF object-graph change tracking, changed-only manifests, delta event history, and payload comparison.**
+## License
 
-## Shorter repository description
-
-**Razor Pages POC for IIIF Manifest change tracking, ChangeSets, changed-only serialization, and delta history.**
-
-## More technical repository description
-
-**ASP.NET Core Razor Pages proof of concept for IIIF Manifest Serializer change tracking, including nested graph deltas, ChangeSets, changed-only output, and append-only revision history.**
-
-## Suggested repository topics
-
-```text
-iiif
-dotnet
-csharp
-aspnet-core
-razor-pages
-change-tracking
-event-driven
-digital-libraries
-proof-of-concept
-```
+This is a proof-of-concept repository, free to use.
