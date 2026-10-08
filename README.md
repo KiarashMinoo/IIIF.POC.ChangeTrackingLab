@@ -2,6 +2,8 @@
 
 An ASP.NET Core Razor Pages proof of concept for SDK-native object-graph change tracking in the IIIF Manifest Serializer for .NET.
 
+[![Architecture diagram](https://gitdiagram.com/diagram-badge.svg)](https://gitdiagram.com/kiarashminoo/IIIF.POC.ChangeTrackingLab?utm_source=readme&utm_medium=badge)
+
 Core SDK:
 
 https://github.com/KiarashMinoo/IIIF.Manifest.Serializer.Net
