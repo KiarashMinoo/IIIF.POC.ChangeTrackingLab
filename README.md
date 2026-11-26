@@ -56,6 +56,10 @@ Per-folder reference documentation lives under [`docs`](docs/README.md):
 - [Services](docs/Services/README.md) — session storage, Manifest mutations, JSON formatting, the sample Manifest factory
 - [wwwroot](docs/wwwroot/README.md) — the demo page's stylesheet
 
+## Author
+
+Built by [Ahmad Kiarash Minoo](https://kiarashminoo.com/). Read the [IIIF.Manifest.Serializer.Net overview](https://kiarashminoo.com/projects/iiif-manifest-serializer-net/).
+
 ## License
 
 This is a proof-of-concept repository, free to use.
